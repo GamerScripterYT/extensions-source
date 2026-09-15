@@ -5,12 +5,12 @@ plugins {
 }
 
 keiyoushi {
-    Name = "Chikari"
+    name = "Chikari"
     versionCode = 0
     contentWarning = ContentWarning.SAFE
     libVersion = "1.6"
 
-source {
+    source {
         lang = "en"
         baseUrl = "https://chikari.moe/"
     }
