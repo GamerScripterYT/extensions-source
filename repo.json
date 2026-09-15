@@ -1,6 +1,9 @@
 {
   "name": "GamerScripterYT Extensions",
+  "badgeLabel": "GamerScripterYT",
   "website": "https://github.com/GamerScripterYT/extensions-source",
+  "contact": "https://github.com/GamerScripterYT/extensions-source/issues",
+  "signingKey": "",
   "signingKeyFingerprint": "",
   "index_v2": "https://raw.githubusercontent.com/GamerScripterYT/extensions-source/main/index.min.json"
 }
