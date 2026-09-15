@@ -84,11 +84,10 @@ class Chikari : ParsedHttpSource() {
         title = document.selectFirst("h1.comic-title, h1.title, h1.entry-title")?.text()?.trim() ?: ""
         author = document.selectFirst("span.author-name, div.author a, .meta-author span")?.text()?.trim()
         artist = document.selectFirst("span.artist-name, div.artist a, .meta-artist span")?.text()?.trim() ?: author
-        description = document.select("div.comic-description, div.synopsis p, div.description").joinToString("
-
-") { it.text().trim() }
+        description = document.select("div.comic-description, div.synopsis p, div.description")
+            .joinToString("\n") { it.text().trim() }
         genre = document.select("div.genres-list a, .tag-item, a.genre").joinToString { it.text().trim() }
-        
+
         val statusText = document.selectFirst("span.status-badge, .comic-status, .status")?.text()?.trim().orEmpty()
         status = parseStatus(statusText)
 
