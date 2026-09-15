@@ -1,19 +1,17 @@
+import io.github.keiyoushi.gradle.api.ContentWarning
+
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    
+    alias(kei.plugins.extension)
 }
 
-ext {
-    extName = "Chikari"
-    pkgNameSuffix = "en.chikari"
-    extClass = ".Chikari"
-    extVersionCode = 1
-    isNsfw = false
-}
+keiyoushi {
+    Name = "Chikari"
+    versionCode = 0
+    contentWarning = ContentWarning.SAFE
+    libVersion = "1.6"
 
-apply(from = "$rootDir/common.gradle")
-
-dependencies {
-    
+source {
+        lang = "en"
+        baseUrl = "https://chikari.moe/"
+    }
 }
