@@ -30,9 +30,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6.3.0
 
       - name: Build extension
-        run: |
-          PROJECT_PATH=$(echo "${{ inputs.extension }}" | tr '/' ':')
-          ./gradlew ":${PROJECT_PATH}:assembleDebug"
+        run: ./gradlew $(echo "${{ inputs.extension }}" | sed 's|/|:|g'):assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
