@@ -31,45 +31,54 @@ jobs:
           # Create repo.json
           cat << 'EOF' > output/repo.json
           {
-            "name": "GamerScripterYT Extensions",
-            "website": "https://github.com/GamerScripterYT/extensions-source",
-            "signingKeyFingerprint": ""
+            "meta": {
+              "name": "GamerScripterYT Extensions",
+              "website": "https://github.com/GamerScripterYT/extensions-source",
+              "signingKeyFingerprint": ""
+            }
           }
           EOF
 
-          # Generate index.json and index.min.json
+          # Generate index.json and index.min.json with required meta schema
           python3 - << 'EOF'
-          import json, os, glob
+          import json, os
 
-          extensions = [
-              {
-                  "name": "Chikari",
-                  "pkg": "eu.kanade.tachiyomi.extension.en.chikari",
-                  "apk": "tachiyomi-en.chikari-v1.apk",
-                  "lang": "en",
-                  "code": 1,
-                  "version": "1.4.0",
-                  "nsfw": 0,
-                  "hasReadme": 0,
-                  "hasChangelog": 0,
-                  "sources": [
-                      {
-                          "name": "Chikari",
-                          "id": "1849204918239102",
-                          "baseUrl": "https://chikari.moe",
-                          "lang": "en"
-                      }
-                  ]
-              }
-          ]
+          repo_data = {
+              "meta": {
+                  "name": "GamerScripterYT Extensions",
+                  "website": "https://github.com/GamerScripterYT/extensions-source",
+                  "signingKeyFingerprint": ""
+              },
+              "extensions": [
+                  {
+                      "name": "Chikari",
+                      "pkg": "eu.kanade.tachiyomi.extension.en.chikari",
+                      "apk": "tachiyomi-en.chikari-v1.apk",
+                      "lang": "en",
+                      "code": 1,
+                      "version": "1.4.0",
+                      "nsfw": 0,
+                      "hasReadme": 0,
+                      "hasChangelog": 0,
+                      "sources": [
+                          {
+                              "name": "Chikari",
+                              "id": "1849204918239102",
+                              "baseUrl": "https://chikari.moe",
+                              "lang": "en"
+                          }
+                      ]
+                  }
+              ]
+          }
 
           with open('output/index.json', 'w', encoding='utf-8') as f:
-              json.dump(extensions, f, indent=2)
+              json.dump(repo_data, f, indent=2)
 
           with open('output/index.min.json', 'w', encoding='utf-8') as f:
-              json.dump(extensions, f, separators=(',', ':'))
+              json.dump(repo_data, f, separators=(',', ':'))
 
-          print("Generated index files successfully!")
+          print("Generated index files with 'meta' successfully!")
           EOF
 
       - name: Deploy files to repo branch
@@ -80,5 +89,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b repo
           git add -A
-          git commit -m "Auto-generate Mihon repo indexes and APKs [skip ci]"
+          git commit -m "Auto-generate Mihon repo indexes with meta [skip ci]"
           git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" repo
