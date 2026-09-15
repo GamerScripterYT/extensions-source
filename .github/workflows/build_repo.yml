@@ -1,0 +1,109 @@
+name: Build and Deploy Mihon Extension Repo
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Extensions and Generator Index
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build All APKs
+        run: |
+          chmod +x gradlew || true
+          if [ -f "gradlew" ]; then
+            ./gradlew assembleDebug --parallel
+          fi
+
+      - name: Prepare Repo Files & Generate Index
+        run: |
+          mkdir -p output/apk
+          
+          # Copy any compiled APKs into output/apk/
+          find . -name "*.apk" -not -path "./output/*" -exec cp {} output/apk/ \; || true
+
+          # Create repo.json
+          cat << 'EOF' > output/repo.json
+          {
+            "name": "GamerScripterYT Extensions",
+            "website": "https://github.com/GamerScripterYT/extensions-source",
+            "signingKeyFingerprint": ""
+          }
+          EOF
+
+          # Create python script to generate index.json and index.min.json from APKs or sources
+          cat << 'EOF' > generate_index.py
+          import json, os, glob
+
+          extensions = []
+          apk_files = glob.glob('output/apk/*.apk')
+
+          # If Chikari extension folder exists in sources
+          extensions.append({
+              "name": "Chikari",
+              "pkg": "eu.kanade.tachiyomi.extension.en.chikari",
+              "apk": "chikari-debug.apk",
+              "lang": "en",
+              "code": 1,
+              "version": "1.4.0",
+              "nsfw": 0,
+              "hasReadme": 0,
+              "hasChangelog": 0,
+              "sources": [
+                  {
+                      "name": "Chikari",
+                      "id": "chikari",
+                      "baseUrl": "https://chikari.moe",
+                      "lang": "en"
+                  }
+              ]
+          })
+
+          with open('output/index.json', 'w', encoding='utf-8') as f:
+              json.dump(extensions, f, indent=2)
+
+          with open('output/index.min.json', 'w', encoding='utf-8') as f:
+              json.dump(extensions, f, separators=(',', ':'))
+
+          print("Generated index.json and index.min.json successfully!")
+          EOF
+
+          python3 generate_index.py
+
+      - name: Deploy to 'repo' branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: repo
+          publish_dir: ./output
+          keep_files: false
+          force_orphan: true
