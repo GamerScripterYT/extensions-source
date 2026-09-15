@@ -32,7 +32,10 @@ class Chikari : ParsedHttpSource() {
         .build()
 
     override fun headersBuilder(): Headers.Builder = Headers.Builder()
-        .add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+        .add(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        )
         .add("Referer", "https://chikari.moe/")
         .add("Origin", "https://chikari.moe")
 
@@ -43,7 +46,8 @@ class Chikari : ParsedHttpSource() {
         return GET("$baseUrl/manga?page=$page", headers)
     }
 
-    override fun popularMangaSelector(): String = "div.grid-comics > div.comic-card, div.manga-grid > div.manga-item, div.cards-container > a.card"
+    override fun popularMangaSelector(): String =
+        "div.grid-comics > div.comic-card, div.manga-grid > div.manga-item, div.cards-container > a.card"
 
     override fun popularMangaFromElement(element: Element): SManga = SManga.create().apply {
         val titleEl = element.selectFirst("h3.title, .comic-title, .title, span.name") ?: element
@@ -55,14 +59,16 @@ class Chikari : ParsedHttpSource() {
         }
     }
 
-    override fun popularMangaNextPageSelector(): String? = "a.pagination-next, a[rel=next], a.next-page"
+    override fun popularMangaNextPageSelector(): String? =
+        "a.pagination-next, a[rel=next], a.next-page"
 
     // ============================== Latest Updates ==============================
     override fun latestUpdatesRequest(page: Int): Request {
         return GET("$baseUrl/comics?sort=latest&page=$page", headers)
     }
 
-    override fun latestUpdatesSelector(): String = "div.latest-updates > div.comic-card, div.updates-grid > div.item"
+    override fun latestUpdatesSelector(): String =
+        "div.latest-updates > div.comic-card, div.updates-grid > div.item"
 
     override fun latestUpdatesFromElement(element: Element): SManga = popularMangaFromElement(element)
 
@@ -73,7 +79,8 @@ class Chikari : ParsedHttpSource() {
         return GET("$baseUrl/search?q=$query&page=$page", headers)
     }
 
-    override fun searchMangaSelector(): String = "div.search-results > div.comic-card, div.search-grid > div.item"
+    override fun searchMangaSelector(): String =
+        "div.search-results > div.comic-card, div.search-grid > div.item"
 
     override fun searchMangaFromElement(element: Element): SManga = popularMangaFromElement(element)
 
@@ -83,7 +90,8 @@ class Chikari : ParsedHttpSource() {
     override fun mangaDetailsParse(document: Document): SManga = SManga.create().apply {
         title = document.selectFirst("h1.comic-title, h1.title, h1.entry-title")?.text()?.trim() ?: ""
         author = document.selectFirst("span.author-name, div.author a, .meta-author span")?.text()?.trim()
-        artist = document.selectFirst("span.artist-name, div.artist a, .meta-artist span")?.text()?.trim() ?: author
+        artist =
+            document.selectFirst("span.artist-name, div.artist a, .meta-artist span")?.text()?.trim() ?: author
         description = document.select("div.comic-description, div.synopsis p, div.description")
             .joinToString("\n") { it.text().trim() }
         genre = document.select("div.genres-list a, .tag-item, a.genre").joinToString { it.text().trim() }
@@ -105,7 +113,8 @@ class Chikari : ParsedHttpSource() {
     }
 
     // ============================== Chapter List ==============================
-    override fun chapterListSelector(): String = "ul.chapter-list > li, div.chapters-container > div.chapter-row, div.chapter-item"
+    override fun chapterListSelector(): String =
+        "ul.chapter-list > li, div.chapters-container > div.chapter-row, div.chapter-item"
 
     override fun chapterFromElement(element: Element): SChapter = SChapter.create().apply {
         val linkEl = element.selectFirst("a.chapter-link, a") ?: element
